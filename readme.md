@@ -1,5 +1,3 @@
-# query-string [![Build Status](https://travis-ci.org/sindresorhus/query-string.svg?branch=master)](https://travis-ci.org/sindresorhus/query-string)
-
 > Parse and stringify URL [query strings](https://en.wikipedia.org/wiki/Query_string)
 
 ---
@@ -12,20 +10,16 @@
 ## Install
 
 ```
-$ npm install query-string
+$ npm install query-string-es5-with-types
 ```
 
-This module targets Node.js 6 or later and the latest version of Chrome, Firefox, and Safari. If you want support for older browsers, or, [if your project is using create-react-app v1](https://github.com/sindresorhus/query-string/pull/148#issuecomment-399656020), use version 5: `npm install query-string@5`.
-
-<a href="https://www.patreon.com/sindresorhus">
-	<img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
-</a>
+This is a fork of [query-string](https://github.com/sindresorhus/query-string) that works in ES5, because @sindresorhus doesn't want to listen to the community and do the simple task of compiling his libraries to ES5.
 
 
 ## Usage
 
 ```js
-const queryString = require('query-string');
+const queryString = require('query-string-es5-with-types');
 
 console.log(location.search);
 //=> '?foo=bar'
