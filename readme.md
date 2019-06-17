@@ -6,7 +6,7 @@
 $ npm install query-string-es5-with-types
 ```
 
-This is a fork of [query-string](https://github.com/sindresorhus/query-string) that works in ES5, because @sindresorhus doesn't want to listen to the community and do the simple task of compiling his libraries to ES5.
+This is a fork of [query-string](https://github.com/sindresorhus/query-string) that is compiled to ES5 so it works in older browsers like IE 11.
 
 
 ## Usage
@@ -43,120 +43,169 @@ console.log(location.search);
 
 ## API
 
-### .parse(*string*, *[options]*)
+### .parse(string, options?)
 
 Parse a query string into an object. Leading `?` or `#` are ignored, so you can pass `location.search` or `location.hash` directly.
 
 The returned object is created with [`Object.create(null)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create) and thus does not have a `prototype`.
 
-#### decode
+#### options
+
+Type: `object`
+
+##### decode
 
 Type: `boolean`<br>
 Default: `true`
 
-Decode the keys and values. URI components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
+Decode the keys and values. URL components are decoded with [`decode-uri-component`](https://github.com/SamVerschueren/decode-uri-component).
 
-#### arrayFormat
+##### arrayFormat
 
 Type: `string`<br>
 Default: `'none'`
 
-Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
-
-- `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+- `'bracket'`: Parse arrays with bracket representation:
 
 ```js
 queryString.parse('foo[]=1&foo[]=2&foo[]=3', {arrayFormat: 'bracket'});
-//=> foo: [1,2,3]
+//=> {foo: ['1', '2', '3']}
 ```
 
-- `index`: stands for parsing taking the index into account, such as:
+- `'index'`: Parse arrays with index representation:
 
 ```js
 queryString.parse('foo[0]=1&foo[1]=2&foo[3]=3', {arrayFormat: 'index'});
-//=> foo: [1,2,3]
+//=> {foo: ['1', '2', '3']}
 ```
 
-- `none`: is the **default** option and removes any bracket representation, such as:
+- `'comma'`: Parse arrays with elements separated by comma:
+
+```js
+queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
+//=> {foo: ['1', '2', '3']}
+```
+
+- `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
 queryString.parse('foo=1&foo=2&foo=3');
-//=> foo: [1,2,3]
+//=> {foo: ['1', '2', '3']}
 ```
 
-### .stringify(*object*, *[options]*)
+##### sort
 
-Stringify an object into a query string, sorting the keys.
+Type: `Function | boolean`<br>
+Default: `true`
 
-#### strict
+Supports both `Function` as a custom sorting function or `false` to disable sorting.
+
+##### parseNumbers
+
+Type: `boolean`<br>
+Default: `false`
+
+```js
+queryString.parse('foo=1', {parseNumbers: true});
+//=> {foo: 1}
+```
+
+Parse the value as a number type instead of string type if it's a number.
+
+##### parseBooleans
+
+Type: `boolean`<br>
+Default: `false`
+
+```js
+queryString.parse('foo=true', {parseBooleans: true});
+//=> {foo: true}
+```
+
+Parse the value as a boolean type instead of string type if it's a boolean.
+
+### .stringify(object, [options])
+
+Stringify an object into a query string and sorting the keys.
+
+#### options
+
+Type: `object`
+
+##### strict
 
 Type: `boolean`<br>
 Default: `true`
 
-Strictly encode URI components with [strict-uri-encode](https://github.com/kevva/strict-uri-encode). It uses [encodeURIComponent](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent)
-if set to false. You probably [don't care](https://github.com/sindresorhus/query-string/issues/42) about this option.
+Strictly encode URI components with [strict-uri-encode](https://github.com/kevva/strict-uri-encode). It uses [encodeURIComponent](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) if set to false. You probably [don't care](https://github.com/sindresorhus/query-string/issues/42) about this option.
 
-#### encode
+##### encode
 
 Type: `boolean`<br>
 Default: `true`
 
 [URL encode](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent) the keys and values.
 
-#### arrayFormat
+##### arrayFormat
 
 Type: `string`<br>
 Default: `'none'`
 
-Supports both `index` for an indexed array representation or `bracket` for a *bracketed* array representation.
-
-- `bracket`: stands for parsing correctly arrays with bracket representation on the query string, such as:
+- `'bracket'`: Serialize arrays using bracket representation:
 
 ```js
-queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'bracket'});
-// => foo[]=1&foo[]=2&foo[]=3
+queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket'});
+//=> 'foo[]=1&foo[]=2&foo[]=3'
 ```
 
-- `index`: stands for parsing taking the index into account, such as:
+- `'index'`: Serialize arrays using index representation:
 
 ```js
-queryString.stringify({foo: [1,2,3]}, {arrayFormat: 'index'});
-// => foo[0]=1&foo[1]=2&foo[3]=3
+queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'index'});
+//=> 'foo[0]=1&foo[1]=2&foo[2]=3'
 ```
 
-- `none`: is the __default__ option and removes any bracket representation, such as:
+- `'comma'`: Serialize arrays by separating elements with comma:
 
 ```js
-queryString.stringify({foo: [1,2,3]});
-// => foo=1&foo=2&foo=3
+queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
+//=> 'foo=1,2,3'
 ```
 
-#### sort
+- `'none'`: Serialize arrays by using duplicate keys:
 
-Type: `Function` `boolean`
+```js
+queryString.stringify({foo: [1, 2, 3]});
+//=> 'foo=1&foo=2&foo=3'
+```
+
+##### sort
+
+Type: `Function | boolean`
 
 Supports both `Function` as a custom sorting function or `false` to disable sorting.
 
 ```js
 const order = ['c', 'a', 'b'];
-queryString.stringify({ a: 1, b: 2, c: 3}, {
-	sort: (m, n) => order.indexOf(m) >= order.indexOf(n)
+
+queryString.stringify({a: 1, b: 2, c: 3}, {
+	sort: (a, b) => order.indexOf(a) - order.indexOf(b)
 });
-// => 'c=3&a=1&b=2'
+//=> 'c=3&a=1&b=2'
 ```
 
 ```js
-queryString.stringify({ b: 1, c: 2, a: 3}, {sort: false});
-// => 'c=3&a=1&b=2'
+queryString.stringify({b: 1, c: 2, a: 3}, {sort: false});
+//=> 'b=1&c=2&a=3'
 ```
 
-If omitted, keys are sorted using `Array#sort`, which means, converting them to strings and comparing strings in Unicode code point order.
+If omitted, keys are sorted using `Array#sort()`, which means, converting them to strings and comparing strings in Unicode code point order.
 
-### .extract(*string*)
+### .extract(string)
 
 Extract a query string from a URL that can be passed into `.parse()`.
 
-### .parseUrl(*string*, *[options]*)
+### .parseUrl(string, options?)
 
 Extract the URL and the query string as an object.
 
@@ -193,7 +242,7 @@ queryString.parse('likes=cake&name=bob&likes=icecream');
 //=> {likes: ['cake', 'icecream'], name: 'bob'}
 
 queryString.stringify({color: ['taupe', 'chartreuse'], id: '515'});
-//=> 'color=chartreuse&color=taupe&id=515'
+//=> 'color=taupe&color=chartreuse&id=515'
 ```
 
 
@@ -211,8 +260,3 @@ queryString.stringify({foo: null});
 queryString.stringify({foo: undefined});
 //=> ''
 ```
-
-
-## License
-
-MIT © [Sindre Sorhus](https://sindresorhus.com)
