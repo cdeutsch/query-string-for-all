@@ -1,9 +1,9 @@
 {
-	"name": "query-string-es5-with-types",
+	"name": "query-string-for-all",
 	"version": "6.7.0",
 	"description": "Parse and stringify URL query strings",
 	"license": "MIT",
-	"repository": "cdeutsch/query-string-es5-with-types",
+	"repository": "cdeutsch/query-string-for-all",
 	"author": {
 		"name": "Sindre Sorhus",
 		"email": "sindresorhus@gmail.com",
