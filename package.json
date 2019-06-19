@@ -1,6 +1,6 @@
 {
 	"name": "query-string-for-all",
-	"version": "6.7.0",
+	"version": "6.7.1",
 	"description": "Parse and stringify URL query strings",
 	"license": "MIT",
 	"repository": "cdeutsch/query-string-for-all",
@@ -37,19 +37,18 @@
 		"decode",
 		"searchparams"
 	],
-	"dependencies": {
-		"split-on-first": "^1.0.0",
-		"decode-uri-component": "^0.2.0",
-		"strict-uri-encode": "^2.0.0"
-	},
+	"dependencies": {},
 	"devDependencies": {
 		"@babel/cli": "^7.2.3",
 		"@babel/core": "^7.2.2",
 		"@babel/preset-env": "^7.2.3",
 		"ava": "^1.4.1",
 		"babel-loader": "^8.0.6",
+		"decode-uri-component": "^0.2.0",
 		"deep-equal": "^1.0.1",
 		"fast-check": "^1.5.0",
+		"split-on-first": "^1.0.0",
+		"strict-uri-encode": "^2.0.0",
 		"tsd": "^0.7.3",
 		"webpack": "^4.34.0",
 		"webpack-cli": "^3.3.4",
