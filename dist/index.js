@@ -1,4 +1,96 @@
-'use strict';
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
@@ -10,25 +102,82 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-var strictUriEncode = require('strict-uri-encode');
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
-var decodeComponent = require('decode-uri-component');
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+var strictUriEncode = __webpack_require__(1);
+
+var decodeComponent = __webpack_require__(2);
+
+var splitOnFirst = __webpack_require__(3);
 
 function encoderForArrayFormat(options) {
   switch (options.arrayFormat) {
     case 'index':
-      return function (key, value, index) {
-        return value === null ? [encode(key, options), '[', index, ']'].join('') : [encode(key, options), '[', encode(index, options), ']=', encode(value, options)].join('');
+      return function (key) {
+        return function (result, value) {
+          var index = result.length;
+
+          if (value === undefined) {
+            return result;
+          }
+
+          if (value === null) {
+            return [].concat(_toConsumableArray(result), [[encode(key, options), '[', index, ']'].join('')]);
+          }
+
+          return [].concat(_toConsumableArray(result), [[encode(key, options), '[', encode(index, options), ']=', encode(value, options)].join('')]);
+        };
       };
 
     case 'bracket':
-      return function (key, value) {
-        return value === null ? [encode(key, options), '[]'].join('') : [encode(key, options), '[]=', encode(value, options)].join('');
+      return function (key) {
+        return function (result, value) {
+          if (value === undefined) {
+            return result;
+          }
+
+          if (value === null) {
+            return [].concat(_toConsumableArray(result), [[encode(key, options), '[]'].join('')]);
+          }
+
+          return [].concat(_toConsumableArray(result), [[encode(key, options), '[]=', encode(value, options)].join('')]);
+        };
+      };
+
+    case 'comma':
+      return function (key) {
+        return function (result, value, index) {
+          if (value === null || value === undefined || value.length === 0) {
+            return result;
+          }
+
+          if (index === 0) {
+            return [[encode(key, options), '=', encode(value, options)].join('')];
+          }
+
+          return [[result, encode(value, options)].join(',')];
+        };
       };
 
     default:
-      return function (key, value) {
-        return value === null ? encode(key, options) : [encode(key, options), '=', encode(value, options)].join('');
+      return function (key) {
+        return function (result, value) {
+          if (value === undefined) {
+            return result;
+          }
+
+          if (value === null) {
+            return [].concat(_toConsumableArray(result), [encode(key, options)]);
+          }
+
+          return [].concat(_toConsumableArray(result), [[encode(key, options), '=', encode(value, options)].join('')]);
+        };
       };
   }
 }
@@ -70,6 +219,13 @@ function parserForArrayFormat(options) {
         }
 
         accumulator[key] = [].concat(accumulator[key], value);
+      };
+
+    case 'comma':
+      return function (key, value, accumulator) {
+        var isArray = typeof value === 'string' && value.split('').indexOf(',') > -1;
+        var newValue = isArray ? value.split(',') : value;
+        accumulator[key] = newValue;
       };
 
     default:
@@ -116,7 +272,18 @@ function keysSorter(input) {
   return input;
 }
 
+function removeHash(input) {
+  var hashStart = input.indexOf('#');
+
+  if (hashStart !== -1) {
+    input = input.slice(0, hashStart);
+  }
+
+  return input;
+}
+
 function extract(input) {
+  input = removeHash(input);
   var queryStart = input.indexOf('?');
 
   if (queryStart === -1) {
@@ -129,7 +296,10 @@ function extract(input) {
 function parse(input, options) {
   options = Object.assign({
     decode: true,
-    arrayFormat: 'none'
+    sort: true,
+    arrayFormat: 'none',
+    parseNumbers: false,
+    parseBooleans: false
   }, options);
   var formatter = parserForArrayFormat(options); // Create an object with no prototype
 
@@ -153,14 +323,23 @@ function parse(input, options) {
     for (var _iterator = input.split('&')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var param = _step.value;
 
-      var _param$replace$split = param.replace(/\+/g, ' ').split('='),
-          _param$replace$split2 = _slicedToArray(_param$replace$split, 2),
-          key = _param$replace$split2[0],
-          value = _param$replace$split2[1]; // Missing `=` should be `null`:
+      var _splitOnFirst = splitOnFirst(param.replace(/\+/g, ' '), '='),
+          _splitOnFirst2 = _slicedToArray(_splitOnFirst, 2),
+          key = _splitOnFirst2[0],
+          value = _splitOnFirst2[1]; // Missing `=` should be `null`:
       // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 
 
       value = value === undefined ? null : decode(value, options);
+
+      if (options.parseNumbers && !Number.isNaN(Number(value))) {
+        value = Number(value);
+      }
+
+      if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+        value = value.toLowerCase() === 'true';
+      }
+
       formatter(decode(key, options), value, ret);
     }
   } catch (err) {
@@ -168,8 +347,8 @@ function parse(input, options) {
     _iteratorError = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion && _iterator.return != null) {
-        _iterator.return();
+      if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+        _iterator["return"]();
       }
     } finally {
       if (_didIteratorError) {
@@ -178,7 +357,11 @@ function parse(input, options) {
     }
   }
 
-  return Object.keys(ret).sort().reduce(function (result, key) {
+  if (options.sort === false) {
+    return ret;
+  }
+
+  return (options.sort === true ? Object.keys(ret).sort() : Object.keys(ret).sort(options.sort)).reduce(function (result, key) {
     var value = ret[key];
 
     if (Boolean(value) && _typeof(value) === 'object' && !Array.isArray(value)) {
@@ -195,8 +378,8 @@ function parse(input, options) {
 exports.extract = extract;
 exports.parse = parse;
 
-exports.stringify = function (obj, options) {
-  if (!obj) {
+exports.stringify = function (object, options) {
+  if (!object) {
     return '';
   }
 
@@ -206,14 +389,14 @@ exports.stringify = function (obj, options) {
     arrayFormat: 'none'
   }, options);
   var formatter = encoderForArrayFormat(options);
-  var keys = Object.keys(obj);
+  var keys = Object.keys(object);
 
   if (options.sort !== false) {
     keys.sort(options.sort);
   }
 
   return keys.map(function (key) {
-    var value = obj[key];
+    var value = object[key];
 
     if (value === undefined) {
       return '';
@@ -224,37 +407,7 @@ exports.stringify = function (obj, options) {
     }
 
     if (Array.isArray(value)) {
-      var result = [];
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = value.slice()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var value2 = _step2.value;
-
-          if (value2 === undefined) {
-            continue;
-          }
-
-          result.push(formatter(key, value2, result.length));
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-
-      return result.join('&');
+      return value.reduce(formatter(key), []).join('&');
     }
 
     return encode(key, options) + '=' + encode(value, options);
@@ -264,14 +417,146 @@ exports.stringify = function (obj, options) {
 };
 
 exports.parseUrl = function (input, options) {
-  var hashStart = input.indexOf('#');
-
-  if (hashStart !== -1) {
-    input = input.slice(0, hashStart);
-  }
-
   return {
-    url: input.split('?')[0] || '',
+    url: removeHash(input).split('?')[0] || '',
     query: parse(extract(input), options)
   };
 };
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function (str) {
+  return encodeURIComponent(str).replace(/[!'()*]/g, function (x) {
+    return "%".concat(x.charCodeAt(0).toString(16).toUpperCase());
+  });
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+var token = '%[a-f0-9]{2}';
+var singleMatcher = new RegExp(token, 'gi');
+var multiMatcher = new RegExp('(' + token + ')+', 'gi');
+
+function decodeComponents(components, split) {
+  try {
+    // Try to decode the entire string first
+    return decodeURIComponent(components.join(''));
+  } catch (err) {// Do nothing
+  }
+
+  if (components.length === 1) {
+    return components;
+  }
+
+  split = split || 1; // Split the array in 2 parts
+
+  var left = components.slice(0, split);
+  var right = components.slice(split);
+  return Array.prototype.concat.call([], decodeComponents(left), decodeComponents(right));
+}
+
+function decode(input) {
+  try {
+    return decodeURIComponent(input);
+  } catch (err) {
+    var tokens = input.match(singleMatcher);
+
+    for (var i = 1; i < tokens.length; i++) {
+      input = decodeComponents(tokens, i).join('');
+      tokens = input.match(singleMatcher);
+    }
+
+    return input;
+  }
+}
+
+function customDecodeURIComponent(input) {
+  // Keep track of all the replacements and prefill the map with the `BOM`
+  var replaceMap = {
+    '%FE%FF': "\uFFFD\uFFFD",
+    '%FF%FE': "\uFFFD\uFFFD"
+  };
+  var match = multiMatcher.exec(input);
+
+  while (match) {
+    try {
+      // Decode as big chunks as possible
+      replaceMap[match[0]] = decodeURIComponent(match[0]);
+    } catch (err) {
+      var result = decode(match[0]);
+
+      if (result !== match[0]) {
+        replaceMap[match[0]] = result;
+      }
+    }
+
+    match = multiMatcher.exec(input);
+  } // Add `%C2` at the end of the map to make sure it does not replace the combinator before everything else
+
+
+  replaceMap['%C2'] = "\uFFFD";
+  var entries = Object.keys(replaceMap);
+
+  for (var i = 0; i < entries.length; i++) {
+    // Replace all decoded components
+    var key = entries[i];
+    input = input.replace(new RegExp(key, 'g'), replaceMap[key]);
+  }
+
+  return input;
+}
+
+module.exports = function (encodedURI) {
+  if (typeof encodedURI !== 'string') {
+    throw new TypeError('Expected `encodedURI` to be of type `string`, got `' + _typeof(encodedURI) + '`');
+  }
+
+  try {
+    encodedURI = encodedURI.replace(/\+/g, ' '); // Try the built in decoder first
+
+    return decodeURIComponent(encodedURI);
+  } catch (err) {
+    // Fallback to a more advanced decoder
+    return customDecodeURIComponent(encodedURI);
+  }
+};
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function (string, separator) {
+  if (!(typeof string === 'string' && typeof separator === 'string')) {
+    throw new TypeError('Expected the arguments to be of type `string`');
+  }
+
+  if (separator === '') {
+    return [string];
+  }
+
+  var separatorIndex = string.indexOf(separator);
+
+  if (separatorIndex === -1) {
+    return [string];
+  }
+
+  return [string.slice(0, separatorIndex), string.slice(separatorIndex + separator.length)];
+};
+
+/***/ })
+/******/ ]);

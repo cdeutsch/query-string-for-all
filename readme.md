@@ -3,16 +3,16 @@
 ## Install
 
 ```
-$ npm install query-string-es5-with-types
+$ npm install query-string-for-all
 ```
 
-This is a fork of [query-string](https://github.com/sindresorhus/query-string) that is compiled to ES5 so it works in older browsers like IE 11.
+This is a fork of [query-string](https://github.com/sindresorhus/query-string) that has all the original code and ES6 NPM dependencies compiled to ES5 so it works in older browsers like IE 11.
 
 
 ## Usage
 
 ```js
-const queryString = require('query-string-es5-with-types');
+const queryString = require('query-string-for-all');
 
 console.log(location.search);
 //=> '?foo=bar'
