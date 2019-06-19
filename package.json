@@ -14,7 +14,7 @@
 	},
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "babel ./index.js -d dist",
+		"build": "webpack --mode production",
 		"test": "npm run build && xo && ava && tsd"
 	},
 	"files": [
@@ -47,9 +47,12 @@
 		"@babel/core": "^7.2.2",
 		"@babel/preset-env": "^7.2.3",
 		"ava": "^1.4.1",
+		"babel-loader": "^8.0.6",
 		"deep-equal": "^1.0.1",
 		"fast-check": "^1.5.0",
 		"tsd": "^0.7.3",
+		"webpack": "^4.34.0",
+		"webpack-cli": "^3.3.4",
 		"xo": "^0.24.0"
 	},
 	"types": "./index.d.ts"
