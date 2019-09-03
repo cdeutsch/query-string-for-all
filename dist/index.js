@@ -293,6 +293,16 @@ function extract(input) {
   return input.slice(queryStart + 1);
 }
 
+function parseValue(value, options) {
+  if (options.parseNumbers && !Number.isNaN(Number(value)) && typeof value === 'string' && value.trim() !== '') {
+    value = Number(value);
+  } else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
+    value = value.toLowerCase() === 'true';
+  }
+
+  return value;
+}
+
 function parse(input, options) {
   options = Object.assign({
     decode: true,
@@ -331,13 +341,6 @@ function parse(input, options) {
 
 
       value = value === undefined ? null : decode(value, options);
-
-      if (options.parseNumbers && !Number.isNaN(Number(value)) && typeof value === 'string' && value.trim() !== '') {
-        value = Number(value);
-      } else if (options.parseBooleans && value !== null && (value.toLowerCase() === 'true' || value.toLowerCase() === 'false')) {
-        value = value.toLowerCase() === 'true';
-      }
-
       formatter(decode(key, options), value, ret);
     }
   } catch (err) {
@@ -352,6 +355,20 @@ function parse(input, options) {
       if (_didIteratorError) {
         throw _iteratorError;
       }
+    }
+  }
+
+  for (var _i = 0, _Object$keys = Object.keys(ret); _i < _Object$keys.length; _i++) {
+    var key = _Object$keys[_i];
+    var value = ret[key];
+
+    if (_typeof(value) === 'object' && value !== null) {
+      for (var _i2 = 0, _Object$keys2 = Object.keys(value); _i2 < _Object$keys2.length; _i2++) {
+        var k = _Object$keys2[_i2];
+        value[k] = parseValue(value[k], options);
+      }
+    } else {
+      ret[key] = parseValue(value, options);
     }
   }
 
