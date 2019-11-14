@@ -123,7 +123,7 @@ function encoderForArrayFormat(options) {
         return function (result, value) {
           var index = result.length;
 
-          if (value === undefined) {
+          if (value === undefined || options.skipNull && value === null) {
             return result;
           }
 
@@ -138,7 +138,7 @@ function encoderForArrayFormat(options) {
     case 'bracket':
       return function (key) {
         return function (result, value) {
-          if (value === undefined) {
+          if (value === undefined || options.skipNull && value === null) {
             return result;
           }
 
@@ -152,12 +152,12 @@ function encoderForArrayFormat(options) {
 
     case 'comma':
       return function (key) {
-        return function (result, value, index) {
+        return function (result, value) {
           if (value === null || value === undefined || value.length === 0) {
             return result;
           }
 
-          if (index === 0) {
+          if (result.length === 0) {
             return [[encode(key, options), '=', encode(value, options)].join('')];
           }
 
@@ -168,7 +168,7 @@ function encoderForArrayFormat(options) {
     default:
       return function (key) {
         return function (result, value) {
-          if (value === undefined) {
+          if (value === undefined || options.skipNull && value === null) {
             return result;
           }
 
@@ -333,7 +333,7 @@ function parse(input, options) {
     for (var _iterator = input.split('&')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var param = _step.value;
 
-      var _splitOnFirst = splitOnFirst(param.replace(/\+/g, ' '), '='),
+      var _splitOnFirst = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '='),
           _splitOnFirst2 = _slicedToArray(_splitOnFirst, 2),
           key = _splitOnFirst2[0],
           value = _splitOnFirst2[1]; // Missing `=` should be `null`:
@@ -404,7 +404,19 @@ exports.stringify = function (object, options) {
     arrayFormat: 'none'
   }, options);
   var formatter = encoderForArrayFormat(options);
-  var keys = Object.keys(object);
+  var objectCopy = Object.assign({}, object);
+
+  if (options.skipNull) {
+    for (var _i3 = 0, _Object$keys3 = Object.keys(objectCopy); _i3 < _Object$keys3.length; _i3++) {
+      var key = _Object$keys3[_i3];
+
+      if (objectCopy[key] === undefined || objectCopy[key] === null) {
+        delete objectCopy[key];
+      }
+    }
+  }
+
+  var keys = Object.keys(objectCopy);
 
   if (options.sort !== false) {
     keys.sort(options.sort);
