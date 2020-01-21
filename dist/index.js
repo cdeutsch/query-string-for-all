@@ -282,6 +282,17 @@ function removeHash(input) {
   return input;
 }
 
+function getHash(url) {
+  var hash = '';
+  var hashStart = url.indexOf('#');
+
+  if (hashStart !== -1) {
+    hash = url.slice(hashStart);
+  }
+
+  return hash;
+}
+
 function extract(input) {
   input = removeHash(input);
   var queryStart = input.indexOf('?');
@@ -448,6 +459,21 @@ exports.parseUrl = function (input, options) {
     url: removeHash(input).split('?')[0] || '',
     query: parse(extract(input), options)
   };
+};
+
+exports.stringifyUrl = function (input, options) {
+  var url = removeHash(input.url).split('?')[0] || '';
+  var queryFromUrl = exports.extract(input.url);
+  var parsedQueryFromUrl = exports.parse(queryFromUrl);
+  var hash = getHash(input.url);
+  var query = Object.assign(parsedQueryFromUrl, input.query);
+  var queryString = exports.stringify(query, options);
+
+  if (queryString) {
+    queryString = "?".concat(queryString);
+  }
+
+  return "".concat(url).concat(queryString).concat(hash);
 };
 
 /***/ }),
