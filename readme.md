@@ -92,6 +92,15 @@ queryString.parse('foo=1,2,3', {arrayFormat: 'comma'});
 //=> {foo: ['1', '2', '3']}
 ```
 
+- `'separator'`: Parse arrays with elements separated by a custom character:
+
+```js
+const queryString = require('query-string');
+
+queryString.parse('foo=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1', '2', '3']}
+```
+
 - `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
@@ -100,6 +109,13 @@ const queryString = require('query-string');
 queryString.parse('foo=1&foo=2&foo=3');
 //=> {foo: ['1', '2', '3']}
 ```
+
+##### arrayFormatSeparator
+
+Type: `string`\
+Default: `','`
+
+The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
 ##### sort
 
@@ -198,6 +214,13 @@ const queryString = require('query-string');
 queryString.stringify({foo: [1, 2, 3]});
 //=> 'foo=1&foo=2&foo=3'
 ```
+
+##### arrayFormatSeparator
+
+Type: `string`\
+Default: `','`
+
+The character used to separate array elements when using `{arrayFormat: 'separator'}`.
 
 ##### sort
 

@@ -151,6 +151,7 @@ function encoderForArrayFormat(options) {
       };
 
     case 'comma':
+    case 'separator':
       return function (key) {
         return function (result, value) {
           if (value === null || value === undefined || value.length === 0) {
@@ -161,7 +162,7 @@ function encoderForArrayFormat(options) {
             return [[encode(key, options), '=', encode(value, options)].join('')];
           }
 
-          return [[result, encode(value, options)].join(',')];
+          return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
         };
       };
 
@@ -222,9 +223,12 @@ function parserForArrayFormat(options) {
       };
 
     case 'comma':
+    case 'separator':
       return function (key, value, accumulator) {
-        var isArray = typeof value === 'string' && value.split('').indexOf(',') > -1;
-        var newValue = isArray ? value.split(',') : value;
+        var isArray = typeof value === 'string' && value.split('').indexOf(options.arrayFormatSeparator) > -1;
+        var newValue = isArray ? value.split(options.arrayFormatSeparator).map(function (item) {
+          return decode(item, options);
+        }) : value === null ? value : decode(value, options);
         accumulator[key] = newValue;
       };
 
@@ -237,6 +241,12 @@ function parserForArrayFormat(options) {
 
         accumulator[key] = [].concat(accumulator[key], value);
       };
+  }
+}
+
+function validateArrayFormatSeparator(value) {
+  if (typeof value !== 'string' || value.length !== 1) {
+    throw new TypeError('arrayFormatSeparator must be single character string');
   }
 }
 
@@ -319,9 +329,11 @@ function parse(input, options) {
     decode: true,
     sort: true,
     arrayFormat: 'none',
+    arrayFormatSeparator: ',',
     parseNumbers: false,
     parseBooleans: false
   }, options);
+  validateArrayFormatSeparator(options.arrayFormatSeparator);
   var formatter = parserForArrayFormat(options); // Create an object with no prototype
 
   var ret = Object.create(null);
@@ -351,7 +363,7 @@ function parse(input, options) {
       // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 
 
-      value = value === undefined ? null : decode(value, options);
+      value = value === undefined ? null : options.arrayFormat === 'comma' ? value : decode(value, options);
       formatter(decode(key, options), value, ret);
     }
   } catch (err) {
@@ -412,8 +424,10 @@ exports.stringify = function (object, options) {
   options = Object.assign({
     encode: true,
     strict: true,
-    arrayFormat: 'none'
+    arrayFormat: 'none',
+    arrayFormatSeparator: ','
   }, options);
+  validateArrayFormatSeparator(options.arrayFormatSeparator);
   var formatter = encoderForArrayFormat(options);
   var objectCopy = Object.assign({}, object);
 
