@@ -116,6 +116,10 @@ var decodeComponent = __webpack_require__(2);
 
 var splitOnFirst = __webpack_require__(3);
 
+var isNullOrUndefined = function isNullOrUndefined(value) {
+  return value === null || value === undefined;
+};
+
 function encoderForArrayFormat(options) {
   switch (options.arrayFormat) {
     case 'index':
@@ -123,7 +127,7 @@ function encoderForArrayFormat(options) {
         return function (result, value) {
           var index = result.length;
 
-          if (value === undefined || options.skipNull && value === null) {
+          if (value === undefined || options.skipNull && value === null || options.skipEmptyString && value === '') {
             return result;
           }
 
@@ -138,7 +142,7 @@ function encoderForArrayFormat(options) {
     case 'bracket':
       return function (key) {
         return function (result, value) {
-          if (value === undefined || options.skipNull && value === null) {
+          if (value === undefined || options.skipNull && value === null || options.skipEmptyString && value === '') {
             return result;
           }
 
@@ -169,7 +173,7 @@ function encoderForArrayFormat(options) {
     default:
       return function (key) {
         return function (result, value) {
-          if (value === undefined || options.skipNull && value === null) {
+          if (value === undefined || options.skipNull && value === null || options.skipEmptyString && value === '') {
             return result;
           }
 
@@ -428,16 +432,19 @@ exports.stringify = function (object, options) {
     arrayFormatSeparator: ','
   }, options);
   validateArrayFormatSeparator(options.arrayFormatSeparator);
+
+  var shouldFilter = function shouldFilter(key) {
+    return options.skipNull && isNullOrUndefined(object[key]) || options.skipEmptyString && object[key] === '';
+  };
+
   var formatter = encoderForArrayFormat(options);
-  var objectCopy = Object.assign({}, object);
+  var objectCopy = {};
 
-  if (options.skipNull) {
-    for (var _i3 = 0, _Object$keys3 = Object.keys(objectCopy); _i3 < _Object$keys3.length; _i3++) {
-      var key = _Object$keys3[_i3];
+  for (var _i3 = 0, _Object$keys3 = Object.keys(object); _i3 < _Object$keys3.length; _i3++) {
+    var key = _Object$keys3[_i3];
 
-      if (objectCopy[key] === undefined || objectCopy[key] === null) {
-        delete objectCopy[key];
-      }
+    if (!shouldFilter(key)) {
+      objectCopy[key] = object[key];
     }
   }
 
