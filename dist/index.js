@@ -476,22 +476,42 @@ exports.stringify = function (object, options) {
 };
 
 exports.parseUrl = function (input, options) {
-  return {
-    url: removeHash(input).split('?')[0] || '',
+  options = Object.assign({
+    decode: true
+  }, options);
+
+  var _splitOnFirst3 = splitOnFirst(input, '#'),
+      _splitOnFirst4 = _slicedToArray(_splitOnFirst3, 2),
+      url = _splitOnFirst4[0],
+      hash = _splitOnFirst4[1];
+
+  return Object.assign({
+    url: url.split('?')[0] || '',
     query: parse(extract(input), options)
-  };
+  }, options && options.parseFragmentIdentifier && hash ? {
+    fragmentIdentifier: decode(hash, options)
+  } : {});
 };
 
 exports.stringifyUrl = function (input, options) {
+  options = Object.assign({
+    encode: true,
+    strict: true
+  }, options);
   var url = removeHash(input.url).split('?')[0] || '';
   var queryFromUrl = exports.extract(input.url);
   var parsedQueryFromUrl = exports.parse(queryFromUrl);
-  var hash = getHash(input.url);
   var query = Object.assign(parsedQueryFromUrl, input.query);
   var queryString = exports.stringify(query, options);
 
   if (queryString) {
     queryString = "?".concat(queryString);
+  }
+
+  var hash = getHash(input.url);
+
+  if (input.fragmentIdentifier) {
+    hash = "#".concat(encode(input.fragmentIdentifier, options));
   }
 
   return "".concat(url).concat(queryString).concat(hash);
