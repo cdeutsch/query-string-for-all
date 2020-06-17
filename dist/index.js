@@ -500,7 +500,9 @@ exports.stringifyUrl = function (input, options) {
   }, options);
   var url = removeHash(input.url).split('?')[0] || '';
   var queryFromUrl = exports.extract(input.url);
-  var parsedQueryFromUrl = exports.parse(queryFromUrl);
+  var parsedQueryFromUrl = exports.parse(queryFromUrl, {
+    sort: false
+  });
   var query = Object.assign(parsedQueryFromUrl, input.query);
   var queryString = exports.stringify(query, options);
 
