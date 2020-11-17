@@ -356,50 +356,31 @@ function parse(query, options) {
     return ret;
   }
 
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
+  for (var _i2 = 0, _query$split2 = query.split('&'); _i2 < _query$split2.length; _i2++) {
+    var param = _query$split2[_i2];
 
-  try {
-    for (var _iterator = query.split('&')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var param = _step.value;
-
-      if (param === '') {
-        continue;
-      }
-
-      var _splitOnFirst = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '='),
-          _splitOnFirst2 = _slicedToArray(_splitOnFirst, 2),
-          key = _splitOnFirst2[0],
-          value = _splitOnFirst2[1]; // Missing `=` should be `null`:
-      // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-
-
-      value = value === undefined ? null : ['comma', 'separator'].includes(options.arrayFormat) ? value : decode(value, options);
-      formatter(decode(key, options), value, ret);
+    if (param === '') {
+      continue;
     }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-        _iterator["return"]();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
+
+    var _splitOnFirst = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '='),
+        _splitOnFirst2 = _slicedToArray(_splitOnFirst, 2),
+        key = _splitOnFirst2[0],
+        value = _splitOnFirst2[1]; // Missing `=` should be `null`:
+    // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+
+
+    value = value === undefined ? null : ['comma', 'separator'].includes(options.arrayFormat) ? value : decode(value, options);
+    formatter(decode(key, options), value, ret);
   }
 
-  for (var _i = 0, _Object$keys = Object.keys(ret); _i < _Object$keys.length; _i++) {
-    var key = _Object$keys[_i];
+  for (var _i4 = 0, _Object$keys2 = Object.keys(ret); _i4 < _Object$keys2.length; _i4++) {
+    var key = _Object$keys2[_i4];
     var value = ret[key];
 
     if (_typeof(value) === 'object' && value !== null) {
-      for (var _i2 = 0, _Object$keys2 = Object.keys(value); _i2 < _Object$keys2.length; _i2++) {
-        var k = _Object$keys2[_i2];
+      for (var _i6 = 0, _Object$keys4 = Object.keys(value); _i6 < _Object$keys4.length; _i6++) {
+        var k = _Object$keys4[_i6];
         value[k] = parseValue(value[k], options);
       }
     } else {
@@ -448,8 +429,8 @@ exports.stringify = function (object, options) {
   var formatter = encoderForArrayFormat(options);
   var objectCopy = {};
 
-  for (var _i3 = 0, _Object$keys3 = Object.keys(object); _i3 < _Object$keys3.length; _i3++) {
-    var key = _Object$keys3[_i3];
+  for (var _i8 = 0, _Object$keys6 = Object.keys(object); _i8 < _Object$keys6.length; _i8++) {
+    var key = _Object$keys6[_i8];
 
     if (!shouldFilter(key)) {
       objectCopy[key] = object[key];
