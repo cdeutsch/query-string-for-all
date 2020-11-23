@@ -75,6 +75,11 @@ test('handle `+` correctly', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++'), {'foo faz': 'bar baz  '});
 });
 
+test('parses numbers with exponential notation as string', t => {
+	t.deepEqual(queryString.parse('192e11=bar'), {'192e11': 'bar'});
+	t.deepEqual(queryString.parse('bar=192e11'), {bar: '192e11'});
+});
+
 test('handle `+` correctly when not decoding', t => {
 	t.deepEqual(queryString.parse('foo+faz=bar+baz++', {decode: false}), {'foo+faz': 'bar+baz++'});
 });
@@ -318,7 +323,7 @@ test('value should not be decoded twice with `arrayFormat` option set as `separa
 });
 
 // See https://github.com/sindresorhus/query-string/issues/242
-test.failing('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
+test('value separated by encoded comma will not be parsed as array with `arrayFormat` option set to `comma`', t => {
 	t.deepEqual(queryString.parse('id=1%2C2%2C3', {arrayFormat: 'comma', parseNumbers: true}), {
 		id: [1, 2, 3]
 	});
