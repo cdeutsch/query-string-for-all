@@ -1,6 +1,6 @@
 {
 	"name": "query-string-for-all",
-	"version": "6.13.7",
+	"version": "6.14.1",
 	"description": "Parse and stringify URL query strings",
 	"license": "MIT",
 	"repository": "cdeutsch/query-string-for-all",
@@ -36,7 +36,8 @@
 		"stringify",
 		"encode",
 		"decode",
-		"searchparams"
+		"searchparams",
+		"filter"
 	],
 	"dependencies": {},
 	"devDependencies": {
@@ -49,6 +50,7 @@
 		"benchmark": "^2.1.4",
 		"deep-equal": "^1.0.1",
 		"fast-check": "^1.5.0",
+		"filter-obj": "^1.1.0",
 		"split-on-first": "^1.0.0",
 		"strict-uri-encode": "^2.0.0",
 		"tsd": "^0.7.3",
