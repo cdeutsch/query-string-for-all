@@ -116,6 +116,8 @@ var decodeComponent = __webpack_require__(2);
 
 var splitOnFirst = __webpack_require__(3);
 
+var filterObject = __webpack_require__(4);
+
 var isNullOrUndefined = function isNullOrUndefined(value) {
   return value === null || value === undefined;
 };
@@ -362,6 +364,10 @@ function parse(query, options) {
     for (var _iterator = query.split('&')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var param = _step.value;
 
+      if (param === '') {
+        continue;
+      }
+
       var _splitOnFirst = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '='),
           _splitOnFirst2 = _slicedToArray(_splitOnFirst, 2),
           key = _splitOnFirst2[0],
@@ -521,6 +527,32 @@ exports.stringifyUrl = function (object, options) {
   return "".concat(url).concat(queryString).concat(hash);
 };
 
+exports.pick = function (input, filter, options) {
+  options = Object.assign({
+    parseFragmentIdentifier: true
+  }, options);
+
+  var _exports$parseUrl = exports.parseUrl(input, options),
+      url = _exports$parseUrl.url,
+      query = _exports$parseUrl.query,
+      fragmentIdentifier = _exports$parseUrl.fragmentIdentifier;
+
+  return exports.stringifyUrl({
+    url: url,
+    query: filterObject(query, filter),
+    fragmentIdentifier: fragmentIdentifier
+  }, options);
+};
+
+exports.exclude = function (input, filter, options) {
+  var exclusionFilter = Array.isArray(filter) ? function (key) {
+    return !filter.includes(key);
+  } : function (key, value) {
+    return !filter(key, value);
+  };
+  return exports.pick(input, exclusionFilter, options);
+};
+
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -654,6 +686,30 @@ module.exports = function (string, separator) {
   }
 
   return [string.slice(0, separatorIndex), string.slice(separatorIndex + separator.length)];
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function (obj, predicate) {
+  var ret = {};
+  var keys = Object.keys(obj);
+  var isArr = Array.isArray(predicate);
+
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var val = obj[key];
+
+    if (isArr ? predicate.indexOf(key) !== -1 : predicate(key, val, obj)) {
+      ret[key] = val;
+    }
+  }
+
+  return ret;
 };
 
 /***/ })
