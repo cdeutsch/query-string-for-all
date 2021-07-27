@@ -184,6 +184,36 @@ test('query strings having indexed arrays and format option as `index`', t => {
 	}), {foo: ['bar', 'baz']});
 });
 
+test('query strings having brackets+separator arrays and format option as `bracket-separator` with 1 value', t => {
+	t.deepEqual(queryString.parse('foo[]=bar', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: ['bar']});
+});
+
+test('query strings having brackets+separator arrays and format option as `bracket-separator` with multiple values', t => {
+	t.deepEqual(queryString.parse('foo[]=bar,baz,,,biz', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: ['bar', 'baz', '', '', 'biz']});
+});
+
+test('query strings with multiple brackets+separator arrays and format option as `bracket-separator` using same key name', t => {
+	t.deepEqual(queryString.parse('foo[]=bar,baz&foo[]=biz,boz', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: ['bar', 'baz', 'biz', 'boz']});
+});
+
+test('query strings having an empty brackets+separator array and format option as `bracket-separator`', t => {
+	t.deepEqual(queryString.parse('foo[]', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: []});
+});
+
+test('query strings having a brackets+separator array and format option as `bracket-separator` with a single empty string', t => {
+	t.deepEqual(queryString.parse('foo[]=', {
+		arrayFormat: 'bracket-separator'
+	}), {foo: ['']});
+});
+
 test('query strings having = within parameters (i.e. GraphQL IDs)', t => {
 	t.deepEqual(queryString.parse('foo=bar=&foo=ba=z='), {foo: ['bar=', 'ba=z=']});
 });
@@ -218,7 +248,7 @@ test('query strings having ordered index arrays and format option as `index`', t
 	}), {bat: 'buz', foo: ['zero', 'two', 'one', 'three']});
 });
 
-test('circuit parse -> stringify', t => {
+test('circuit parse → stringify', t => {
 	const original = 'foo[3]=foo&foo[2]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const expected = {bat: 'buz', foo: ['', 'one', null, 'foo']};
@@ -231,11 +261,38 @@ test('circuit parse -> stringify', t => {
 	t.is(queryString.stringify(expected, options), sortedOriginal);
 });
 
-test('circuit original -> parse - > stringify -> sorted original', t => {
+test('circuit original → parse → stringify → sorted original', t => {
 	const original = 'foo[21474836471]=foo&foo[21474836470]&foo[1]=one&foo[0]=&bat=buz';
 	const sortedOriginal = 'bat=buz&foo[0]=&foo[1]=one&foo[2]&foo[3]=foo';
 	const options = {
 		arrayFormat: 'index'
+	};
+
+	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
+});
+
+test('circuit parse → stringify with array commas', t => {
+	const original = 'c=,a,,&b=&a=';
+	const sortedOriginal = 'a=&b=&c=,a,,';
+	const expected = {
+		c: ['', 'a', '', ''],
+		b: '',
+		a: ''
+	};
+	const options = {
+		arrayFormat: 'comma'
+	};
+
+	t.deepEqual(queryString.parse(original, options), expected);
+
+	t.is(queryString.stringify(expected, options), sortedOriginal);
+});
+
+test('circuit original → parse → stringify with array commas → sorted original', t => {
+	const original = 'c=,a,,&b=&a=';
+	const sortedOriginal = 'a=&b=&c=,a,,';
+	const options = {
+		arrayFormat: 'comma'
 	};
 
 	t.deepEqual(queryString.stringify(queryString.parse(original, options), options), sortedOriginal);
