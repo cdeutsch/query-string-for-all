@@ -92,6 +92,8 @@ module.exports =
 "use strict";
 
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -121,6 +123,8 @@ var filterObject = __webpack_require__(4);
 var isNullOrUndefined = function isNullOrUndefined(value) {
   return value === null || value === undefined;
 };
+
+var encodeFragmentIdentifier = Symbol('encodeFragmentIdentifier');
 
 function encoderForArrayFormat(options) {
   switch (options.arrayFormat) {
@@ -158,19 +162,26 @@ function encoderForArrayFormat(options) {
 
     case 'comma':
     case 'separator':
-      return function (key) {
-        return function (result, value) {
-          if (value === null || value === undefined || value.length === 0) {
-            return result;
-          }
+    case 'bracket-separator':
+      {
+        var keyValueSep = options.arrayFormat === 'bracket-separator' ? '[]=' : '=';
+        return function (key) {
+          return function (result, value) {
+            if (value === undefined || options.skipNull && value === null || options.skipEmptyString && value === '') {
+              return result;
+            } // Translate null to an empty string so that it doesn't serialize as 'null'
 
-          if (result.length === 0) {
-            return [[encode(key, options), '=', encode(value, options)].join('')];
-          }
 
-          return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
+            value = value === null ? '' : value;
+
+            if (result.length === 0) {
+              return [[encode(key, options), keyValueSep, encode(value, options)].join('')];
+            }
+
+            return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
+          };
         };
-      };
+      }
 
     default:
       return function (key) {
@@ -238,6 +249,28 @@ function parserForArrayFormat(options) {
           return decode(item, options);
         }) : value === null ? value : decode(value, options);
         accumulator[key] = newValue;
+      };
+
+    case 'bracket-separator':
+      return function (key, value, accumulator) {
+        var isArray = /(\[\])$/.test(key);
+        key = key.replace(/\[\]$/, '');
+
+        if (!isArray) {
+          accumulator[key] = value ? decode(value, options) : value;
+          return;
+        }
+
+        var arrayValue = value === null ? [] : value.split(options.arrayFormatSeparator).map(function (item) {
+          return decode(item, options);
+        });
+
+        if (accumulator[key] === undefined) {
+          accumulator[key] = arrayValue;
+          return;
+        }
+
+        accumulator[key] = [].concat(accumulator[key], arrayValue);
       };
 
     default:
@@ -370,7 +403,7 @@ function parse(query, options) {
     // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
 
 
-    value = value === undefined ? null : ['comma', 'separator'].includes(options.arrayFormat) ? value : decode(value, options);
+    value = value === undefined ? null : ['comma', 'separator', 'bracket-separator'].includes(options.arrayFormat) ? value : decode(value, options);
     formatter(decode(key, options), value, ret);
   }
 
@@ -455,6 +488,10 @@ exports.stringify = function (object, options) {
     }
 
     if (Array.isArray(value)) {
+      if (value.length === 0 && options.arrayFormat === 'bracket-separator') {
+        return encode(key, options) + '[]';
+      }
+
       return value.reduce(formatter(key), []).join('&');
     }
 
@@ -483,10 +520,10 @@ exports.parseUrl = function (url, options) {
 };
 
 exports.stringifyUrl = function (object, options) {
-  options = Object.assign({
+  options = Object.assign(_defineProperty({
     encode: true,
     strict: true
-  }, options);
+  }, encodeFragmentIdentifier, true), options);
   var url = removeHash(object.url).split('?')[0] || '';
   var queryFromUrl = exports.extract(object.url);
   var parsedQueryFromUrl = exports.parse(queryFromUrl, {
@@ -502,16 +539,16 @@ exports.stringifyUrl = function (object, options) {
   var hash = getHash(object.url);
 
   if (object.fragmentIdentifier) {
-    hash = "#".concat(encode(object.fragmentIdentifier, options));
+    hash = "#".concat(options[encodeFragmentIdentifier] ? encode(object.fragmentIdentifier, options) : object.fragmentIdentifier);
   }
 
   return "".concat(url).concat(queryString).concat(hash);
 };
 
 exports.pick = function (input, filter, options) {
-  options = Object.assign({
+  options = Object.assign(_defineProperty({
     parseFragmentIdentifier: true
-  }, options);
+  }, encodeFragmentIdentifier, false), options);
 
   var _exports$parseUrl = exports.parseUrl(input, options),
       url = _exports$parseUrl.url,

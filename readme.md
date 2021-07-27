@@ -101,6 +101,30 @@ queryString.parse('foo=1|2|3', {arrayFormat: 'separator', arrayFormatSeparator: 
 //=> {foo: ['1', '2', '3']}
 ```
 
+- `'bracket-separator'`: Parse arrays (that are explicitly marked with brackets) with elements separated by a custom character:
+
+```js
+const queryString = require('query-string');
+
+queryString.parse('foo[]', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: []}
+
+queryString.parse('foo[]=', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: ['']}
+
+queryString.parse('foo[]=1', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1']}
+
+queryString.parse('foo[]=1|2|3', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1', '2', '3']}
+
+queryString.parse('foo[]=1||3|||6', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1', '', 3, '', '', '6']}
+
+queryString.parse('foo[]=1|2|3&bar=fluffy&baz[]=4', {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> {foo: ['1', '2', '3'], bar: 'fluffy', baz:['4']}
+```
+
 - `'none'`: Parse arrays with elements using duplicate keys:
 
 ```js
@@ -204,6 +228,47 @@ const queryString = require('query-string');
 
 queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'comma'});
 //=> 'foo=1,2,3'
+
+queryString.stringify({foo: [1, null, '']}, {arrayFormat: 'comma'});
+//=> 'foo=1,,'
+// Note that typing information for null values is lost
+// and `.parse('foo=1,,')` would return `{foo: [1, '', '']}`.
+```
+
+- `'separator'`: Serialize arrays by separating elements with a custom character:
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'separator', arrayFormatSeparator: '|'});
+//=> 'foo=1|2|3'
+```
+
+- `'bracket-separator'`: Serialize arrays by explicitly post-fixing array names with brackets and separating elements with a custom character:
+
+```js
+const queryString = require('query-string');
+
+queryString.stringify({foo: []}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]'
+
+queryString.stringify({foo: ['']}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]='
+
+queryString.stringify({foo: [1]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]=1'
+
+queryString.stringify({foo: [1, 2, 3]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]=1|2|3'
+
+queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]=1||3|||6'
+
+queryString.stringify({foo: [1, '', 3, null, null, 6]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|', skipNull: true});
+//=> 'foo[]=1||3|6'
+
+queryString.stringify({foo: [1, 2, 3], bar: 'fluffy', baz: [4]}, {arrayFormat: 'bracket-separator', arrayFormatSeparator: '|'});
+//=> 'foo[]=1|2|3&bar=fluffy&baz[]=4'
 ```
 
 - `'none'`: Serialize arrays by using duplicate keys:
@@ -496,3 +561,9 @@ queryString.stringify({foo: null});
 queryString.stringify({foo: undefined});
 //=> ''
 ```
+
+## FAQ
+
+### Why is it parsing `+` as a space?
+
+See [this answer](https://github.com/sindresorhus/query-string/issues/305).

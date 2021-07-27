@@ -126,13 +126,26 @@ test('array stringify representation with array commas', t => {
 	}), 'bar=one,two&foo');
 });
 
-test('array stringify representation with array commas and null value', t => {
+test('array stringify representation with array commas, null & empty string', t => {
 	t.is(queryString.stringify({
-		foo: [null, 'a', null, ''],
-		bar: [null]
+		c: [null, 'a', '', null],
+		b: [null],
+		a: ['']
 	}, {
 		arrayFormat: 'comma'
-	}), 'foo=a');
+	}), 'a=&b=&c=,a,,');
+});
+
+test('array stringify representation with array commas, null & empty string (skip both)', t => {
+	t.is(queryString.stringify({
+		c: [null, 'a', '', null],
+		b: [null],
+		a: ['']
+	}, {
+		skipNull: true,
+		skipEmptyString: true,
+		arrayFormat: 'comma'
+	}), 'c=a');
 });
 
 test('array stringify representation with array commas and 0 value', t => {
@@ -141,7 +154,7 @@ test('array stringify representation with array commas and 0 value', t => {
 		bar: [null]
 	}, {
 		arrayFormat: 'comma'
-	}), 'foo=a,0');
+	}), 'bar=&foo=a,,0');
 });
 
 test('array stringify representation with a bad array format', t => {
@@ -157,6 +170,71 @@ test('array stringify representation with array indexes and sparse array', t => 
 	const fixture = ['one', 'two'];
 	fixture[10] = 'three';
 	t.is(queryString.stringify({bar: fixture}, {arrayFormat: 'index'}), 'bar[0]=one&bar[1]=two&bar[2]=three');
+});
+
+test('array stringify representation with brackets and separators with empty array', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: []
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]&foo');
+});
+
+test('array stringify representation with brackets and separators with single value', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=one&foo');
+});
+
+test('array stringify representation with brackets and separators with multiple values', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one', 'two', 'three']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=one,two,three&foo');
+});
+
+test('array stringify representation with brackets and separators with a single empty string', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=&foo');
+});
+
+test('array stringify representation with brackets and separators with a multiple empty string', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['', 'two', '']
+	}, {
+		arrayFormat: 'bracket-separator'
+	}), 'bar[]=,two,&foo');
+});
+
+test('array stringify representation with brackets and separators with dropped empty strings', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['', 'two', '']
+	}, {
+		arrayFormat: 'bracket-separator',
+		skipEmptyString: true
+	}), 'bar[]=two&foo');
+});
+
+test('array stringify representation with brackets and separators with dropped null values', t => {
+	t.is(queryString.stringify({
+		foo: null,
+		bar: ['one', null, 'three', null, '', 'six']
+	}, {
+		arrayFormat: 'bracket-separator',
+		skipNull: true
+	}), 'bar[]=one,three,,six');
 });
 
 test('should sort keys in given order', t => {
