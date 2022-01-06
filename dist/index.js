@@ -160,6 +160,21 @@ function encoderForArrayFormat(options) {
         };
       };
 
+    case 'colon-list-separator':
+      return function (key) {
+        return function (result, value) {
+          if (value === undefined || options.skipNull && value === null || options.skipEmptyString && value === '') {
+            return result;
+          }
+
+          if (value === null) {
+            return [].concat(_toConsumableArray(result), [[encode(key, options), ':list='].join('')]);
+          }
+
+          return [].concat(_toConsumableArray(result), [[encode(key, options), ':list=', encode(value, options)].join('')]);
+        };
+      };
+
     case 'comma':
     case 'separator':
     case 'bracket-separator':
@@ -225,6 +240,24 @@ function parserForArrayFormat(options) {
       return function (key, value, accumulator) {
         result = /(\[\])$/.exec(key);
         key = key.replace(/\[\]$/, '');
+
+        if (!result) {
+          accumulator[key] = value;
+          return;
+        }
+
+        if (accumulator[key] === undefined) {
+          accumulator[key] = [value];
+          return;
+        }
+
+        accumulator[key] = [].concat(accumulator[key], value);
+      };
+
+    case 'colon-list-separator':
+      return function (key, value, accumulator) {
+        result = /(:list)$/.exec(key);
+        key = key.replace(/:list$/, '');
 
         if (!result) {
           accumulator[key] = value;
